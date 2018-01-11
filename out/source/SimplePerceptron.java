@@ -21,27 +21,31 @@ int trainingIndex = 0;
 
 public void setup() {
     
-    brain = new Perceptron();
+    brain = new Perceptron(3);
 
     for(int i = 0; i < points.length; i++) {
         points[i] = new Point();
     }
-    float[] inputs = {-1, 0.5f};
-    int guess = brain.guess(inputs);
-    println(guess);
 }
 
 public void draw() {
     background(255);
     stroke(0);
-    line(0,0,width,height);
+    // line(0, height, width, 0);
+    Point p1 = new Point(-1, f(-1));
+    Point p2 = new Point(1, f(1));
+    line(p1.pixelX(), p1.pixelY(), p2.pixelX(), p2.pixelY());
+
+    Point p3 = new Point(-1, brain.guessY(-1));
+    Point p4 = new Point(1, brain.guessY(1));
+    line(p3.pixelX(), p3.pixelY(), p4.pixelX(), p4.pixelY());
 
     for(Point pt : points) {
         pt.show();
     }
 
     for(Point pt : points) {
-        float[] inputs = {pt.x, pt.y};
+        float[] inputs = {pt.x, pt.y, pt.bias};
         int target = pt.label;
         int guess = brain.guess(inputs);
         if(guess == target) {
@@ -50,11 +54,11 @@ public void draw() {
             fill(255, 0, 0);
         }
         noStroke();
-        ellipse(pt.x, pt.y, 32, 32);
+        ellipse(pt.pixelX(), pt.pixelY(), 16, 16);
     }
 
     Point training = points[trainingIndex];
-    float[] inputs = {training.x, training.y};
+    float[] inputs = {training.x, training.y, training.bias};
     int target = training.label;
     brain.train(inputs, target);
     trainingIndex++;
@@ -77,12 +81,13 @@ public int sign(float n) {
 }
 
 class Perceptron {
-    float[] weights = new float[2];
+    float[] weights;
     float lr = 0.1f;
 
     // constructor
-    Perceptron() {
-        // Initalise the weightw randomly
+    Perceptron(int n) {
+        weights = new float[n];
+        // Initalise the weights randomly
         for(int i = 0; i < weights.length; i++) {
             weights[i] = random(-1, 1);
         }
@@ -106,21 +111,54 @@ class Perceptron {
             weights[i] += error * inputs[i] * lr;
         }
     }
+
+    public float guessY(float x) {
+        // float m = weights[0] / weights[1];
+        // float b = weights[2];
+        // return m*x + b;
+
+        float w0 = weights[0];
+        float w1 = weights[1];
+        float w2 = weights[2];
+
+        return -(w2/w1) - (w0/w1) * x;
+    }
 }
+public float f(float x) {
+    //y = mx + b
+    return 0.8f*x - 0.1f;
+}
+
 class Point {
     float x;
     float y;
+    float bias = 1;
     int label;
 
-    Point() {
-        x = random(width);
-        y = random(height);
+    Point(float x_, float y_) {
+        x = x_;
+        y = y_;
+    }
 
-        if (x > y) {
+    Point() {
+        x = random(-1, 1);
+        y = random(-1, 1);
+
+        float lineY = f(x);
+
+        if (y > lineY) {
             label = 1;
         } else {
             label = -1;
         }
+    }
+
+    public float pixelX() {
+        return map(x, -1, 1, 0, width);
+    }
+
+    public float pixelY() {
+        return  map(y, -1, 1, height, 0);
     }
 
     public void show() {
@@ -130,7 +168,11 @@ class Point {
         } else {
             fill(0);
         }
-        ellipse(x, y, 32, 32);
+
+        float px = pixelX();
+        float py = pixelY();
+
+        ellipse(px, py, 32, 32);
     }
 }
     public void settings() {  size(800, 800); }
