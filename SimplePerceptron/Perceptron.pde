@@ -13,7 +13,7 @@ class Perceptron {
 
     // constructor
     Perceptron() {
-        // Initalise the weightw randomly
+        // Initalise the weights randomly
         for(int i = 0; i < weights.length; i++) {
             weights[i] = random(-1, 1);
         }
