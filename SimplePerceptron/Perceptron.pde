@@ -9,6 +9,7 @@ int sign(float n) {
 
 class Perceptron {
     float[] weights = new float[2];
+    float lr = 0.1;
 
     // constructor
     Perceptron() {
@@ -25,5 +26,15 @@ class Perceptron {
         }
         int output = sign(sum);
         return output;
+    }
+
+    void train(float[] inputs, int target){
+        int guess = guess(inputs);
+        int error = target - guess;
+
+        // Tune all the weights
+        for(int i = 0; i < weights.length; i++) {
+            weights[i] += error * inputs[i] * lr;
+        }
     }
 }
