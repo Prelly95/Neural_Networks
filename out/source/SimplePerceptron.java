@@ -15,15 +15,29 @@ import java.io.IOException;
 public class SimplePerceptron extends PApplet {
 
 Perceptron p;
+
+Point[] points = new Point[100];
+
+
 public void setup() {
     
     p = new Perceptron();
+
+    for(int i = 0; i < points.length; i++) {
+        points[i] = new Point();
+    }
     float[] inputs = {-1, 0.5f};
     int guess = p.guess(inputs);
     println(guess);
 }
 
 public void draw() {
+    background(255);
+    stroke(0);
+    line(0,0,width,height);
+    for(Point p : points) {
+        p.show();
+    }
 
 }
 // the activation function
@@ -55,7 +69,33 @@ class Perceptron {
         return output;
     }
 }
-    public void settings() {  size(200, 200); }
+class Point {
+    float x;
+    float y;
+    int label;
+
+    Point() {
+        x = random(width);
+        y = random(height);
+
+        if (x > y) {
+            label = 1;
+        } else {
+            label = -1;
+        }
+    }
+
+    public void show() {
+        stroke(0);
+        if(label ==1) {
+            fill(255);
+        } else {
+            fill(0);
+        }
+        ellipse(x, y, 8, 8);
+    }
+}
+    public void settings() {  size(500, 500); }
     static public void main(String[] passedArgs) {
         String[] appletArgs = new String[] { "SimplePerceptron" };
         if (passedArgs != null) {
